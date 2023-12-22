@@ -1,13 +1,13 @@
-const express = require("express");
 require("dotenv").config();
+const express = require("express");
 const app = express();
 const cors = require("cors");
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion } = require("mongodb");
 
 // middleware
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
 const uri = process.env.DB_URL;
 
@@ -24,6 +24,16 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const database = client.db("job-task");
+    const taskCollection = database.collection("tasks");
+
+    app.post("/create-task", async (req, res) => {
+      const task = req.body;
+      const result = await taskCollection.insertOne(task);
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
@@ -36,9 +46,9 @@ async function run() {
 }
 run().catch(console.dir);
 
-app.get("/", async (req, res) => {
+app.get("/", (req, res) => {
   res.send("Job task server running...");
 });
-app.listen(port, async (req, res) => {
+app.listen(port, (req, res) => {
   console.log(`server running on port: ${port}`);
 });
