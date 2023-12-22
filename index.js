@@ -33,7 +33,10 @@ async function run() {
       const result = await taskCollection.insertOne(task);
       res.send(result);
     });
-
+    app.get("/tasks", async (req, res) => {
+      const tasks = await taskCollection.find().toArray();
+      res.send(tasks);
+    });
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
